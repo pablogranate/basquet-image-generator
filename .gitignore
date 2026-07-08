@@ -1,0 +1,12 @@
+.DS_Store
+index.backup-*.html
+
+# Carpetas de imagenes pesadas — se suben al server por tar+scp, no por git
+ESCUDOS */
+LOGOS */
+FONDOS/
+FONDOS_THUMBS/
+Endesa/
+EURO/
+MEDIA DAY*/
+MEDIADAY*/
