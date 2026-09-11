@@ -6,10 +6,14 @@ echo  ============================================
 echo   BasquetPass.TV  Image Generator
 echo  ============================================
 echo.
-echo  [1/2] Actualizando library.js...
+cd /d "%~dp0"
+if not exist node_modules\sharp (
+    echo  [0/2] Instalando dependencias (sharp, para miniaturas)...
+    call npm install --no-audit --no-fund --omit=dev
+)
+echo  [1/2] Actualizando library.js y miniaturas...
 echo        (LN, LUB, LF, LA, Chile, Federal, Dos, LBP Fem, LDA + fondos)
 echo.
-cd /d "%~dp0"
 node generate-library.js
 if errorlevel 1 (
     echo.
