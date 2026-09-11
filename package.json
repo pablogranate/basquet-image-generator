@@ -1,0 +1,18 @@
+{
+  "name": "basquet-image-generator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BasquetPass.TV promotional image generator (single-file web app)",
+  "scripts": {
+    "start": "node server.js",
+    "generate": "node generate-library.js",
+    "test": "node --test test/generator.test.js",
+    "smoke": "node --test test/smoke.test.js"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.34.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  }
+}

@@ -11,3 +11,6 @@ EURO/
 MEDIA DAY*/
 MEDIADAY*/
 .env.local
+
+node_modules/
+MEDIA_THUMBS/

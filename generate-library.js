@@ -1,7 +1,18 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = __dirname;
+// LIBRARY_ROOT lets tests point the generator at a fixture tree.
+const ROOT = process.env.LIBRARY_ROOT || __dirname;
+const ARGS = new Set(process.argv.slice(2));
+const PRETTY = ARGS.has('--pretty');
+// --strict: never reuse entries from the previous library.js when a folder is missing.
+const STRICT = ARGS.has('--strict');
+
+// sharp is optional: without it the library is still generated, just without thumbnails.
+let sharp = null;
+try { sharp = require('sharp'); } catch (e) {
+  console.warn('WARNING: "sharp" not installed; skipping thumbnail generation (npm install sharp).');
+}
 
 function readExistingLibrary() {
   const file = path.join(ROOT, 'library.js');
@@ -26,6 +37,86 @@ function readDir(relPath) {
 
 function isImageFile(name) {
   return /\.(png|jpg|jpeg|webp|svg|PNG|JPG)$/i.test(name);
+}
+
+// ─── PLAYER DEDUPE ───
+// Media day folders often hold several shots of the same player, named like
+// "Juan Perez 1", "Juan Perez (2)", "Capurro LN (10)(1)", "(3) Suplente Alonso",
+// "Utilero (2) Gabriel Díaz", "Ana Gomez x2", "tyren johnson copia".
+// Collapse them to one entry per (name, number), keeping the first in sort order.
+// Also seen: "10 Augusto Alonso", "001. Santiago Perez", "Unión Basquet 96175 Nicolás Cabrera".
+// Digits never belong to a person's name here, so every digit run is a shot counter.
+function canonicalPlayerName(name) {
+  return name
+    .replace(/\s+(copia|x\d+)(\s+\d+)?$/i, ' ') // "copia", "copia 2", "x2"
+    .replace(/\d+/g, ' ')                       // shot counters anywhere
+    .replace(/[().\-_]+/g, ' ')                  // punctuation left behind by counters
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// A real player has at most this many shots. Bigger groups are unnamed batches
+// ("QuimsaMediaDay 005" ... "467") where every file is a different person.
+const MAX_SHOTS_PER_PLAYER = 40;
+
+function dedupePlayers(players) {
+  const groups = new Map();
+  for (const p of players) {
+    const name = canonicalPlayerName(p.name);
+    const key = `${name.toLowerCase()}|${p.number}`;
+    if (!groups.has(key)) groups.set(key, { name, members: [] });
+    groups.get(key).members.push(p);
+  }
+  const out = [];
+  for (const { name, members } of groups.values()) {
+    if (members.length > MAX_SHOTS_PER_PLAYER || !name) out.push(...members);
+    else out.push({ ...members[0], name });
+  }
+  return out;
+}
+
+// ─── THUMBNAILS ───
+const PLAYER_THUMB_DIR = 'MEDIA_THUMBS';
+const PLAYER_THUMB_SIZE = 96;   // .lib-thumb renders at 44px; 96 covers 2x displays
+const BG_THUMB_DIR = 'FONDOS_THUMBS';
+const BG_THUMB_WIDTH = 240;
+
+function thumbPathFor(thumbDir, srcRel) {
+  return `${thumbDir}/${srcRel.replace(/\.[^.]+$/, '.jpg')}`;
+}
+
+function thumbIsFresh(srcAbs, outAbs) {
+  return fs.existsSync(outAbs) && fs.statSync(outAbs).mtimeMs >= fs.statSync(srcAbs).mtimeMs;
+}
+
+async function writeThumb(srcRel, outRel, resize) {
+  const srcAbs = path.join(ROOT, srcRel);
+  const outAbs = path.join(ROOT, outRel);
+  if (thumbIsFresh(srcAbs, outAbs)) return false;
+  fs.mkdirSync(path.dirname(outAbs), { recursive: true });
+  await sharp(srcAbs).resize(resize).flatten({ background: '#0a0a0a' }).jpeg({ quality: 70, progressive: true }).toFile(outAbs);
+  return true;
+}
+
+// Adds thumb paths to every player in every team. Returns count of thumbs written.
+async function addPlayerThumbs(leagues) {
+  if (!sharp) return 0;
+  let written = 0;
+  for (const league of Object.values(leagues)) {
+    for (const team of Object.values(league.teams)) {
+      for (const p of team.players) {
+        if (!fs.existsSync(path.join(ROOT, p.file))) continue;
+        const outRel = thumbPathFor(PLAYER_THUMB_DIR, p.file);
+        try {
+          if (await writeThumb(p.file, outRel, { width: PLAYER_THUMB_SIZE, height: PLAYER_THUMB_SIZE, fit: 'cover', position: 'top' })) written++;
+          p.thumb = outRel;
+        } catch (e) {
+          console.warn(`WARNING: thumb failed for ${p.file}: ${e.message}`);
+        }
+      }
+    }
+  }
+  return written;
 }
 
 // ─── LIGA NACIONAL ───
@@ -458,16 +549,21 @@ function buildChileTeams() {
 
 // ─── FONDOS ───
 
-function buildBackgrounds() {
+async function buildBackgrounds() {
   const dir = 'FONDOS';
-  const thumbDir = 'FONDOS_THUMBS';
   const files = readDir(dir).filter(isImageFile).sort((a, b) => a.localeCompare(b, 'es'));
-  return files.map(f => {
+  const out = [];
+  for (const f of files) {
     const full = `${dir}/${f}`;
-    const thumbFile = f.replace(/\.[^.]+$/, '.jpg');
-    const thumb = fs.existsSync(path.join(ROOT, thumbDir, thumbFile)) ? `${thumbDir}/${thumbFile}` : full;
-    return { full, thumb };
-  });
+    const thumbRel = thumbPathFor(BG_THUMB_DIR, f);
+    if (sharp) {
+      try { await writeThumb(full, thumbRel, { width: BG_THUMB_WIDTH }); }
+      catch (e) { console.warn(`WARNING: thumb failed for ${full}: ${e.message}`); }
+    }
+    // Never point the gallery at the full-size file; a missing thumb shows a placeholder instead.
+    out.push({ full, thumb: fs.existsSync(path.join(ROOT, thumbRel)) ? thumbRel : '' });
+  }
+  return out;
 }
 
 // ─── LOGO-ONLY LEAGUES (no media day) ───
@@ -487,6 +583,7 @@ function buildLogoOnlyLeague(logosDir) {
 
 function buildLeagueWithFallback(name, logo, teams) {
   if (teams && Object.keys(teams).length) return { logo, teams };
+  if (STRICT) return { logo, teams: teams || {} };
   const existing = EXISTING_LIBRARY?.leagues?.[name];
   if (existing && Object.keys(existing.teams || {}).length) return existing;
   return { logo, teams: teams || {} };
@@ -494,7 +591,7 @@ function buildLeagueWithFallback(name, logo, teams) {
 
 const LOGO_ONLY_LEAGUES = [
   { name: 'LIGA FEDERAL',  logosDir: 'ESCUDOS LIGA FEDERAL',       logoFile: 'LOGOS LIGAS/4 - LOGOS LIGAS/LIGA FEDERAL.png' },
-  { name: 'LIGA DOS',      logosDir: 'Escudos LIGA DOS',            logoFile: 'LOGOS LIGAS/4 - LOGOS LIGAS/LIGA DOS.png' },
+  { name: 'LIGA DOS',      logosDir: 'ESCUDOS LIGA DOS',            logoFile: 'LOGOS LIGAS/4 - LOGOS LIGAS/LIGA DOS.png' },
   { name: 'LBP FEMENINA',  logosDir: 'LOGOS BASQUETPRO FEMENINA',   logoFile: 'LOGOS LIGAS/4 - LOGOS LIGAS/LBP FEMENINA.PNG' },
   { name: 'LDA',           logosDir: 'ESCUDOS LDA',                 logoFile: 'LOGOS LIGAS/4 - LOGOS LIGAS/LDA.png' },
   { name: 'LIGA ENDESA',   logosDir: 'ESCUDOS ENDESA',             logoFile: 'LOGOS LIGAS/4 - LOGOS LIGAS/LIGA ENDESA.png' },
@@ -508,6 +605,7 @@ const LOGO_ONLY_LEAGUES = [
 
 // ─── Build and write ───
 
+async function main() {
 const library = {
   leagues: {
     'LIGA NACIONAL': buildLeagueWithFallback('LIGA NACIONAL', LN_LOGO, buildLNTeams()),
@@ -516,7 +614,7 @@ const library = {
     'LIGA ARGENTINA': buildLeagueWithFallback('LIGA ARGENTINA', LA_LOGO, buildLATeams()),
     'LNB CHILE': buildLeagueWithFallback('LNB CHILE', CHILE_LOGO, buildChileTeams())
   },
-  backgrounds: buildBackgrounds()
+  backgrounds: await buildBackgrounds()
 };
 
 // Add logo-only leagues
@@ -526,6 +624,12 @@ for (const l of LOGO_ONLY_LEAGUES) {
     teams: buildLogoOnlyLeague(l.logosDir)
   };
 }
+
+// Collapse repeated shots of the same player, then thumbnail what remains
+for (const league of Object.values(library.leagues)) {
+  for (const team of Object.values(league.teams)) team.players = dedupePlayers(team.players);
+}
+const thumbsWritten = await addPlayerThumbs(library.leagues);
 
 // Stats
 for (const [league, data] of Object.entries(library.leagues)) {
@@ -537,6 +641,10 @@ for (const [league, data] of Object.entries(library.leagues)) {
   }
 }
 
-const output = `const LIBRARY = ${JSON.stringify(library, null, 2)};\n`;
+const json = PRETTY ? JSON.stringify(library, null, 2) : JSON.stringify(library);
+const output = `const LIBRARY = ${json};\n`;
 fs.writeFileSync(path.join(ROOT, 'library.js'), output, 'utf-8');
-console.log('\nlibrary.js written successfully.');
+console.log(`\nlibrary.js written (${(output.length / 1024).toFixed(0)} KB, ${thumbsWritten} thumbnails generated).`);
+}
+
+main().catch(e => { console.error(e); process.exit(1); });
