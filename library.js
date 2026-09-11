@@ -25777,99 +25777,99 @@ const LIBRARY = {
       "logo": "LOGOS LIGAS/4 - LOGOS LIGAS/LIGA DOS.png",
       "teams": {
         "Alemán Concepción": {
-          "logo": "Escudos LIGA DOS/Alemán Concepción.png",
+          "logo": "ESCUDOS LIGA DOS/Alemán Concepción.png",
           "players": []
         },
         "Arturo Prat San Felipe": {
-          "logo": "Escudos LIGA DOS/Arturo Prat San Felipe.png",
+          "logo": "ESCUDOS LIGA DOS/Arturo Prat San Felipe.png",
           "players": []
         },
         "Basket Pucón": {
-          "logo": "Escudos LIGA DOS/Basket Pucón.png",
+          "logo": "ESCUDOS LIGA DOS/Basket Pucón.png",
           "players": []
         },
         "CDE Aleman Puerto Varas": {
-          "logo": "Escudos LIGA DOS/CDE Aleman Puerto Varas.png",
+          "logo": "ESCUDOS LIGA DOS/CDE Aleman Puerto Varas.png",
           "players": []
         },
         "Constitución": {
-          "logo": "Escudos LIGA DOS/Constitución.png",
+          "logo": "ESCUDOS LIGA DOS/Constitución.png",
           "players": []
         },
         "Deportes La Unión": {
-          "logo": "Escudos LIGA DOS/Deportes La Unión.png",
+          "logo": "ESCUDOS LIGA DOS/Deportes La Unión.png",
           "players": []
         },
         "Huachipato": {
-          "logo": "Escudos LIGA DOS/Huachipato.png",
+          "logo": "ESCUDOS LIGA DOS/Huachipato.png",
           "players": []
         },
         "Humboldt": {
-          "logo": "Escudos LIGA DOS/Humboldt.png",
+          "logo": "ESCUDOS LIGA DOS/Humboldt.png",
           "players": []
         },
         "Illapel Básquetbol": {
-          "logo": "Escudos LIGA DOS/Illapel Básquetbol.png",
+          "logo": "ESCUDOS LIGA DOS/Illapel Básquetbol.png",
           "players": []
         },
         "Liceo Curico": {
-          "logo": "Escudos LIGA DOS/Liceo Curico.png",
+          "logo": "ESCUDOS LIGA DOS/Liceo Curico.png",
           "players": []
         },
         "Luis Matte Larraín": {
-          "logo": "Escudos LIGA DOS/Luis Matte Larraín.png",
+          "logo": "ESCUDOS LIGA DOS/Luis Matte Larraín.png",
           "players": []
         },
         "Municipal Chillán": {
-          "logo": "Escudos LIGA DOS/Municipal Chillán.png",
+          "logo": "ESCUDOS LIGA DOS/Municipal Chillán.png",
           "players": []
         },
         "Omega Concepción": {
-          "logo": "Escudos LIGA DOS/Omega Concepción.png",
+          "logo": "ESCUDOS LIGA DOS/Omega Concepción.png",
           "players": []
         },
         "Quilpué Básquetbol": {
-          "logo": "Escudos LIGA DOS/Quilpué Básquetbol.png",
+          "logo": "ESCUDOS LIGA DOS/Quilpué Básquetbol.png",
           "players": []
         },
         "San Luis Quillota": {
-          "logo": "Escudos LIGA DOS/San Luis Quillota.png",
+          "logo": "ESCUDOS LIGA DOS/San Luis Quillota.png",
           "players": []
         },
         "Sergio Ceppi": {
-          "logo": "Escudos LIGA DOS/Sergio Ceppi.png",
+          "logo": "ESCUDOS LIGA DOS/Sergio Ceppi.png",
           "players": []
         },
         "Sokol Antofagasta": {
-          "logo": "Escudos LIGA DOS/Sokol Antofagasta.png",
+          "logo": "ESCUDOS LIGA DOS/Sokol Antofagasta.png",
           "players": []
         },
         "Sportiva Italiana": {
-          "logo": "Escudos LIGA DOS/Sportiva Italiana.png",
+          "logo": "ESCUDOS LIGA DOS/Sportiva Italiana.png",
           "players": []
         },
         "Stadio Italiano": {
-          "logo": "Escudos LIGA DOS/Stadio Italiano.png",
+          "logo": "ESCUDOS LIGA DOS/Stadio Italiano.png",
           "players": []
         },
         "The Sharks La Serena": {
-          "logo": "Escudos LIGA DOS/The Sharks La Serena.png",
+          "logo": "ESCUDOS LIGA DOS/The Sharks La Serena.png",
           "players": []
         },
         "Truenos Talca": {
-          "logo": "Escudos LIGA DOS/Truenos Talca.png",
+          "logo": "ESCUDOS LIGA DOS/Truenos Talca.png",
           "players": []
         },
         "UDE Temuco": {
-          "logo": "Escudos LIGA DOS/UDE Temuco.png",
+          "logo": "ESCUDOS LIGA DOS/UDE Temuco.png",
           "players": []
         },
         "Villa Alemana": {
-          "logo": "Escudos LIGA DOS/Villa Alemana.png",
+          "logo": "ESCUDOS LIGA DOS/Villa Alemana.png",
           "players": []
         },
         "Árabe Valparaíso": {
-          "logo": "Escudos LIGA DOS/Árabe Valparaíso.png",
+          "logo": "ESCUDOS LIGA DOS/Árabe Valparaíso.png",
           "players": []
         }
       }
@@ -26317,219 +26317,219 @@ const LIBRARY = {
   "backgrounds": [
     {
       "full": "FONDOS/Fondo euroliga.png",
-      "thumb": "FONDOS/Fondo euroliga.png"
+      "thumb": "FONDOS_THUMBS/Fondo euroliga.jpg"
     },
     {
       "full": "FONDOS/FondoLigaArgentina.jpg",
-      "thumb": "FONDOS/FondoLigaArgentina.jpg"
+      "thumb": "FONDOS_THUMBS/FondoLigaArgentina.jpg"
     },
     {
       "full": "FONDOS/FondoLigaFemenina.jpg",
-      "thumb": "FONDOS/FondoLigaFemenina.jpg"
+      "thumb": "FONDOS_THUMBS/FondoLigaFemenina.jpg"
     },
     {
       "full": "FONDOS/FondoLigaNacional.jpg",
-      "thumb": "FONDOS/FondoLigaNacional.jpg"
+      "thumb": "FONDOS_THUMBS/FondoLigaNacional.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000918_0c84063b-6fc0-4b19-b694-d26e68eaf19d (1)-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000918_0c84063b-6fc0-4b19-b694-d26e68eaf19d (1)-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000918_0c84063b-6fc0-4b19-b694-d26e68eaf19d (1)-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000918_0c84063b-6fc0-4b19-b694-d26e68eaf19d-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000918_0c84063b-6fc0-4b19-b694-d26e68eaf19d-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000918_0c84063b-6fc0-4b19-b694-d26e68eaf19d-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000918_2fd48944-9209-4efa-89cc-0880d8a89ae7 (1)-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000918_2fd48944-9209-4efa-89cc-0880d8a89ae7 (1)-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000918_2fd48944-9209-4efa-89cc-0880d8a89ae7 (1)-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000918_2fd48944-9209-4efa-89cc-0880d8a89ae7-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000918_2fd48944-9209-4efa-89cc-0880d8a89ae7-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000918_2fd48944-9209-4efa-89cc-0880d8a89ae7-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000918_4be7732e-6ab7-45e9-8278-5907fb4cdc2a-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000918_4be7732e-6ab7-45e9-8278-5907fb4cdc2a-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000918_4be7732e-6ab7-45e9-8278-5907fb4cdc2a-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000920_acdc6fe0-294c-4ca9-ba6f-96836c07b568 (1)-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000920_acdc6fe0-294c-4ca9-ba6f-96836c07b568 (1)-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000920_acdc6fe0-294c-4ca9-ba6f-96836c07b568 (1)-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000920_acdc6fe0-294c-4ca9-ba6f-96836c07b568-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000920_acdc6fe0-294c-4ca9-ba6f-96836c07b568-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000920_acdc6fe0-294c-4ca9-ba6f-96836c07b568-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000920_b05c5f08-d970-44b8-b172-85780cbda311-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000920_b05c5f08-d970-44b8-b172-85780cbda311-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000920_b05c5f08-d970-44b8-b172-85780cbda311-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000920_c73c6a28-1fd5-4082-baa2-04a6b3e1453b-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000920_c73c6a28-1fd5-4082-baa2-04a6b3e1453b-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000920_c73c6a28-1fd5-4082-baa2-04a6b3e1453b-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000920_eca85c78-e9bd-4611-b567-39135fed1b1d-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000920_eca85c78-e9bd-4611-b567-39135fed1b1d-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000920_eca85c78-e9bd-4611-b567-39135fed1b1d-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000922_1cdce46a-12d8-4475-bda5-93b755a14e5e-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000922_1cdce46a-12d8-4475-bda5-93b755a14e5e-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000922_1cdce46a-12d8-4475-bda5-93b755a14e5e-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000922_4dc63f97-2dbc-4576-bad8-929814b4158f-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000922_4dc63f97-2dbc-4576-bad8-929814b4158f-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000922_4dc63f97-2dbc-4576-bad8-929814b4158f-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_000922_742495d2-de7b-4841-85fe-80c05cb892c1-pichi.png",
-      "thumb": "FONDOS/hf_20260327_000922_742495d2-de7b-4841-85fe-80c05cb892c1-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_000922_742495d2-de7b-4841-85fe-80c05cb892c1-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001107_ec29e8c5-9b8b-49f8-a458-953e92ea7ae8-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001107_ec29e8c5-9b8b-49f8-a458-953e92ea7ae8-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001107_ec29e8c5-9b8b-49f8-a458-953e92ea7ae8-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001229_04507ccd-e94f-48b3-a63f-c18136b21726-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001229_04507ccd-e94f-48b3-a63f-c18136b21726-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001229_04507ccd-e94f-48b3-a63f-c18136b21726-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001229_2d190374-83f0-4cf8-a191-cb7229afc21f-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001229_2d190374-83f0-4cf8-a191-cb7229afc21f-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001229_2d190374-83f0-4cf8-a191-cb7229afc21f-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001229_38acccb4-808a-4a80-bd5f-9265c5e97229-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001229_38acccb4-808a-4a80-bd5f-9265c5e97229-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001229_38acccb4-808a-4a80-bd5f-9265c5e97229-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001229_4b52c470-9b31-4fa0-9eed-6ad82a66b5f1-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001229_4b52c470-9b31-4fa0-9eed-6ad82a66b5f1-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001229_4b52c470-9b31-4fa0-9eed-6ad82a66b5f1-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001230_15382d25-0605-4b37-a2af-b96a691915ad-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001230_15382d25-0605-4b37-a2af-b96a691915ad-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001230_15382d25-0605-4b37-a2af-b96a691915ad-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001230_1ef2b3c2-d31e-4e0c-80e2-8603a2e025d2-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001230_1ef2b3c2-d31e-4e0c-80e2-8603a2e025d2-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001230_1ef2b3c2-d31e-4e0c-80e2-8603a2e025d2-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001230_68894bc3-d347-4a49-a1b9-d2cef7dd94ab-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001230_68894bc3-d347-4a49-a1b9-d2cef7dd94ab-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001230_68894bc3-d347-4a49-a1b9-d2cef7dd94ab-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001230_c743778b-d26b-4420-9b37-8de13da7acfd-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001230_c743778b-d26b-4420-9b37-8de13da7acfd-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001230_c743778b-d26b-4420-9b37-8de13da7acfd-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001232_190fec4b-a650-4288-a02a-13a3a6439c82-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001232_190fec4b-a650-4288-a02a-13a3a6439c82-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001232_190fec4b-a650-4288-a02a-13a3a6439c82-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001232_99b49a08-04cf-4006-b257-6ac673bc57d6-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001232_99b49a08-04cf-4006-b257-6ac673bc57d6-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001232_99b49a08-04cf-4006-b257-6ac673bc57d6-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001232_af488423-6131-47cf-a820-a0239a830a7c-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001232_af488423-6131-47cf-a820-a0239a830a7c-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001232_af488423-6131-47cf-a820-a0239a830a7c-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001232_dd32298e-5951-4a3b-86c7-a0043f0dd3e8-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001232_dd32298e-5951-4a3b-86c7-a0043f0dd3e8-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001232_dd32298e-5951-4a3b-86c7-a0043f0dd3e8-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001240_0b20688c-9399-4c55-a0ee-4ae302992482-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001240_0b20688c-9399-4c55-a0ee-4ae302992482-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001240_0b20688c-9399-4c55-a0ee-4ae302992482-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001240_8aeb9af3-73af-4bfb-b8f2-2e8d9e4572c8-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001240_8aeb9af3-73af-4bfb-b8f2-2e8d9e4572c8-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001240_8aeb9af3-73af-4bfb-b8f2-2e8d9e4572c8-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001240_e28cb756-3391-45e2-80dc-c2e7688758b1-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001240_e28cb756-3391-45e2-80dc-c2e7688758b1-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001240_e28cb756-3391-45e2-80dc-c2e7688758b1-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001240_fbc894c5-82a9-47be-b72f-65b40c6c4512-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001240_fbc894c5-82a9-47be-b72f-65b40c6c4512-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001240_fbc894c5-82a9-47be-b72f-65b40c6c4512-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001242_5026293e-b432-47ca-9624-b8e1df0d5323-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001242_5026293e-b432-47ca-9624-b8e1df0d5323-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001242_5026293e-b432-47ca-9624-b8e1df0d5323-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001242_cbc02634-a062-4117-901f-f51a5472f761-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001242_cbc02634-a062-4117-901f-f51a5472f761-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001242_cbc02634-a062-4117-901f-f51a5472f761-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001242_e2b3e7b0-9e51-446a-9218-3cab1379464c-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001242_e2b3e7b0-9e51-446a-9218-3cab1379464c-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001242_e2b3e7b0-9e51-446a-9218-3cab1379464c-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001245_25115904-249e-41b6-9fce-bc1b3fbecd6f-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001245_25115904-249e-41b6-9fce-bc1b3fbecd6f-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001245_25115904-249e-41b6-9fce-bc1b3fbecd6f-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001245_67456421-eaf6-407e-b93f-476b3643f765-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001245_67456421-eaf6-407e-b93f-476b3643f765-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001245_67456421-eaf6-407e-b93f-476b3643f765-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001834_228a92fb-cf64-4fe0-85de-03658cd64a5e-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001834_228a92fb-cf64-4fe0-85de-03658cd64a5e-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001834_228a92fb-cf64-4fe0-85de-03658cd64a5e-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001834_6a324113-06b5-4e45-ac77-a4b22616309b-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001834_6a324113-06b5-4e45-ac77-a4b22616309b-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001834_6a324113-06b5-4e45-ac77-a4b22616309b-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001836_5ddf095a-bc94-4f8e-83a5-67fcb1082d5d-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001836_5ddf095a-bc94-4f8e-83a5-67fcb1082d5d-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001836_5ddf095a-bc94-4f8e-83a5-67fcb1082d5d-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001836_80f24b7e-5f95-41ee-92de-7aec60b138fc-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001836_80f24b7e-5f95-41ee-92de-7aec60b138fc-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001836_80f24b7e-5f95-41ee-92de-7aec60b138fc-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001836_a1a9bd39-1817-4a1b-90a0-9d2f90910492 (1)-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001836_a1a9bd39-1817-4a1b-90a0-9d2f90910492 (1)-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001836_a1a9bd39-1817-4a1b-90a0-9d2f90910492 (1)-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001836_a1a9bd39-1817-4a1b-90a0-9d2f90910492-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001836_a1a9bd39-1817-4a1b-90a0-9d2f90910492-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001836_a1a9bd39-1817-4a1b-90a0-9d2f90910492-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001836_f8a35872-63a1-4201-a608-85f5c44fc3fd-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001836_f8a35872-63a1-4201-a608-85f5c44fc3fd-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001836_f8a35872-63a1-4201-a608-85f5c44fc3fd-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001838_ac2abc08-9ffe-460c-94a6-ce76614d9548-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001838_ac2abc08-9ffe-460c-94a6-ce76614d9548-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001838_ac2abc08-9ffe-460c-94a6-ce76614d9548-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001838_c21fe07b-e3a9-4eb0-ac78-6df97657c311-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001838_c21fe07b-e3a9-4eb0-ac78-6df97657c311-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001838_c21fe07b-e3a9-4eb0-ac78-6df97657c311-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001838_f7449073-92fb-4338-9b81-ec3358f6022c-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001838_f7449073-92fb-4338-9b81-ec3358f6022c-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001838_f7449073-92fb-4338-9b81-ec3358f6022c-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001838_fb84c0a1-0c90-4893-baa1-b563a271f314-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001838_fb84c0a1-0c90-4893-baa1-b563a271f314-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001838_fb84c0a1-0c90-4893-baa1-b563a271f314-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001839_32e839ed-ed1f-4f2a-af02-6a2648cb6e40-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001839_32e839ed-ed1f-4f2a-af02-6a2648cb6e40-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001839_32e839ed-ed1f-4f2a-af02-6a2648cb6e40-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001839_71b97d46-a189-4b32-b718-d4c6cc24fdd3-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001839_71b97d46-a189-4b32-b718-d4c6cc24fdd3-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001839_71b97d46-a189-4b32-b718-d4c6cc24fdd3-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001839_9603a34f-03a9-4f18-a49b-b8ff10fa49c3-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001839_9603a34f-03a9-4f18-a49b-b8ff10fa49c3-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001839_9603a34f-03a9-4f18-a49b-b8ff10fa49c3-pichi.jpg"
     },
     {
       "full": "FONDOS/hf_20260327_001839_c2d1ae20-2ba5-4e74-b7d7-e09dba27e469-pichi.png",
-      "thumb": "FONDOS/hf_20260327_001839_c2d1ae20-2ba5-4e74-b7d7-e09dba27e469-pichi.png"
+      "thumb": "FONDOS_THUMBS/hf_20260327_001839_c2d1ae20-2ba5-4e74-b7d7-e09dba27e469-pichi.jpg"
     },
     {
       "full": "FONDOS/home-chile.jpg.jpeg",
@@ -26541,7 +26541,7 @@ const LIBRARY = {
     },
     {
       "full": "FONDOS/Mesa de trabajo 1.png",
-      "thumb": "FONDOS/Mesa de trabajo 1.png"
+      "thumb": "FONDOS_THUMBS/Mesa de trabajo 1.jpg"
     }
   ]
 };

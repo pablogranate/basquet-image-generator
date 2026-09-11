@@ -300,6 +300,7 @@
             align-items: center; justify-content: center; line-height: 1;
             padding: 0;
         }
+        .lib-thumb-missing { opacity: .35; filter: grayscale(1); }
         .lib-thumb-wrap { position: relative; display: inline-block; }
         .lib-thumb-wrap:hover .lib-thumb-remove { display: flex; }
         .toggle-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8; cursor: pointer; margin: 6px 0; }
@@ -1470,12 +1471,19 @@ function lazyLoadThumbs(container) {
             tx.drawImage(tmp, (THUMB_SIZE - w) / 2, (THUMB_SIZE - h) / 2, w, h);
             imgEl.src = tc.toDataURL('image/jpeg', 0.5);
         };
-        tmp.onerror = () => { imgEl.src = src; };
+        // 404 / tainted: keep placeholder, never re-request the same URL
+        tmp.onerror = () => { imgEl.classList.add('lib-thumb-missing'); };
         tmp.src = src;
     }
 
-    // Load all thumbnails directly — they're small enough
-    container.querySelectorAll('img[data-src]').forEach(img => loadThumb(img));
+    const imgs = container.querySelectorAll('img[data-src]');
+    if (!('IntersectionObserver' in window)) { imgs.forEach(loadThumb); return; }
+    // Only fetch thumbs that are (nearly) visible; teams can have hundreds of files
+    if (container._thumbIO) container._thumbIO.disconnect(); // drop observers from the previous team
+    container._thumbIO = new IntersectionObserver((entries, io) => {
+        for (const en of entries) if (en.isIntersecting) { io.unobserve(en.target); loadThumb(en.target); }
+    }, { root: container.closest('.controls') || null, rootMargin: '200px 0px' });
+    imgs.forEach(img => container._thumbIO.observe(img));
 }
 
 async function onLibTeamSelect(teamNum) {
@@ -1550,16 +1558,6 @@ async function onLibTeamSelect(teamNum) {
         thumbsDiv.appendChild(img);
         if (i === 0) {
             img.classList.add('active');
-            const tmp = new Image(); tmp.crossOrigin = 'anonymous';
-            tmp.onload = () => {
-                const tc = document.createElement('canvas'), tx = tc.getContext('2d');
-                tc.width = 60; tc.height = 60;
-                const sc = Math.max(60/tmp.width, 60/tmp.height);
-                const tw = tmp.width*sc, th = tmp.height*sc;
-                tx.drawImage(tmp, (60-tw)/2, (60-th)/2, tw, th);
-                img.src = tc.toDataURL('image/jpeg', 0.5);
-            };
-            tmp.src = encodeURI(p.file);
             const playerImg = await loadImg(p.file);
             if (playerImg) {
                 state.playerFiles[`player${teamNum}`] = p.file;
@@ -1705,7 +1703,7 @@ function initBgGallery() {
         thumb.title = `Fondo ${i + 1}`;
         thumb.loading = 'lazy';
         thumb.src = encodeURI(thumbPath);
-        thumb.onerror = () => { thumb.src = encodeURI(fullPath); thumb.onerror = null; };
+        thumb.onerror = () => { thumb.classList.add('lib-thumb-missing'); thumb.onerror = null; };
         thumb.onclick = () => {
             sel.value = fullPath;
             onBgSelect();
@@ -2327,7 +2325,7 @@ function applyPixelEffects(off, fx) {
 
 function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
     if (!img) return;
-    const fx = getFxState();
+    const fx = _frameFx || getFxState();
     const off = document.createElement('canvas'); off.width = Math.ceil(w*1.1); off.height = H;
     const oc = off.getContext('2d');
     const s = Math.max(off.width/img.width, H/img.height)*(scale||1);
@@ -3264,9 +3262,26 @@ function renderMobile() {
     }
 }
 
-function render() {
-    canvas = canvasD; ctx = ctxD; renderDesktop();
-    canvas = canvasM; ctx = ctxM; renderMobile();
+// Synchronous render. mode: 'desktop' | 'mobile' | undefined (both)
+let _frameFx = null;
+function renderNow(mode) {
+    _frameFx = getFxState();
+    try {
+        if (mode !== 'mobile')  { canvas = canvasD; ctx = ctxD; renderDesktop(); }
+        if (mode !== 'desktop') { canvas = canvasM; ctx = ctxM; renderMobile(); }
+    } finally { _frameFx = null; }
+}
+// Coalesce renders: many inputs/mousemoves per frame -> one draw per frame
+let _rafId = 0, _rafMode = undefined, _rafBoth = false;
+function render(mode) {
+    if (!mode) _rafBoth = true; else if (!_rafBoth) _rafMode = _rafMode && _rafMode !== mode ? undefined : mode;
+    if (_rafBoth) _rafMode = undefined;
+    if (_rafId) return;
+    _rafId = requestAnimationFrame(() => {
+        const m = _rafBoth ? undefined : _rafMode;
+        _rafId = 0; _rafMode = undefined; _rafBoth = false;
+        renderNow(m);
+    });
 }
 
 // ===== CANVAS DRAG INTERACTION =====
@@ -3650,7 +3665,7 @@ function setupCanvasInteraction(canvasEl, mode) {
         const [W, H] = getWH();
         const pos = getCanvasMousePos(canvasEl, e);
         moveOrScaleElement(dragState.key, mode, dragState.startT, dragState.bounds, dragState.startMouse, pos, dragState.handle);
-        render();
+        render(mode);
     });
 
     const endDrag = () => { if (dragState) schedulePoseSave(); dragState = null; };
@@ -3681,7 +3696,7 @@ function downloadImage(size) {
     // Temporarily hide selection handles for clean export
     const savedSel = selectedElement;
     selectedElement = null;
-    render();
+    renderNow();
     const now = new Date();
     const dd = String(now.getDate()).padStart(2,'0');
     const mm = String(now.getMonth()+1).padStart(2,'0');
