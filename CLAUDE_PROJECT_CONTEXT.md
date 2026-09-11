@@ -5,9 +5,11 @@ App web de un solo archivo HTML para generar imágenes promocionales de partidos
 
 ## Archivos Principales
 - **index.html** — App completa (HTML + CSS + JS en un solo archivo)
-- **library.js** — Base de datos de ligas, equipos, jugadores y fondos (auto-generada)
-- **generate-library.js** — Script Node.js para regenerar library.js escaneando carpetas
-- **server.js** — Servidor HTTP local para servir la app
+- **library.js** — Base de datos de ligas, equipos, jugadores y fondos (auto-generada, JSON compacto)
+- **generate-library.js** — Regenera library.js escaneando carpetas. Colapsa fotos repetidas del mismo jugador y genera miniaturas (`MEDIA_THUMBS/`, `FONDOS_THUMBS/`) si `sharp` está instalado. Flags: `--pretty`, `--strict`.
+- **server.js** — Servidor HTTP local (gzip + cache headers, igual que nginx en prod)
+- **test/generator.test.js** — Tests del generador contra un árbol de fixtures (`npm test`)
+- **test/smoke.test.js** — Smoke test en Chromium headless con Playwright (`npm run smoke`, o `PLAYWRIGHT_PATH=...`)
 
 ## Cómo Ejecutar
 1. Abrir terminal en la carpeta del proyecto
@@ -36,7 +38,7 @@ App web de un solo archivo HTML para generar imágenes promocionales de partidos
 - ESCUDOS LIGA FEMENINA/ — Escudos Liga Femenina
 - ESCUDOS LIGA FEDERAL/ — Escudos Liga Federal
 - LOGOS CHERY/ — Escudos Chile
-- Escudos LIGA DOS/ — Escudos Liga Dos
+- ESCUDOS LIGA DOS/ — Escudos Liga Dos
 - LOGOS BASQUETPRO FEMENINA/ — Escudos LBP Femenina
 - LOGOS LIGAS/ — Logos de cada liga
 - FONDOS/ — Fondos generados con IA
@@ -59,6 +61,15 @@ App web de un solo archivo HTML para generar imágenes promocionales de partidos
 ## Notas Técnicas
 - Requiere localhost (no file://) por CORS en canvas
 - crossOrigin='anonymous' en todas las imágenes
-- Thumbnails comprimidos a 60px JPEG 50% para carga rápida
-- Auto-save cada 400ms de cambios
+- Miniaturas pre-generadas por `generate-library.js` (jugadores 96px en `MEDIA_THUMBS/`, fondos 240px en `FONDOS_THUMBS/`). El navegador nunca descarga una foto completa para mostrar una miniatura; si falta, muestra un placeholder.
+- Miniaturas de jugadores cargan bajo demanda (IntersectionObserver) al hacer scroll
+- render() se agrupa por frame (requestAnimationFrame); el arrastre redibuja solo el canvas activo
+- Capas de jugador procesadas (efectos) se cachean por imagen/tamaño/escala/efectos; mover en X reutiliza la capa
+- Auto-save de inputs a localStorage cada 1000ms; imágenes de cada slot van a IndexedDB al asignarse (store `slotImages`)
 - IndexedDB para fotos custom persistentes por liga/equipo
+- Fuentes Loos en WOFF2 (subset latino) con fallback OTF
+
+## Producción
+- Servida en generator.basket-app.com desde `/opt/basquet-image-generator` (nginx, detrás del gate del portal)
+- Deploy: scp de index.html y library.js. Carpetas de imágenes se suben aparte con tar+scp.
+- Las carpetas MEDIA DAY deben subirse desde la PC que las tiene; sin ellas los jugadores muestran placeholders.
