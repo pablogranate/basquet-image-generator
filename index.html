@@ -4,25 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Basquet Image Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         @font-face {
             font-family: 'Loos Regular Bold';
-            src: url('assets/fonts/Loos-Normal-Bold.otf') format('opentype');
+            src: url('assets/fonts/Loos-Normal-Bold.woff2') format('woff2'), url('assets/fonts/Loos-Normal-Bold.otf') format('opentype');
             font-style: normal;
             font-weight: 700;
             font-display: swap;
         }
         @font-face {
             font-family: 'Loos';
-            src: url('assets/fonts/Loos-Compressed-Black.otf') format('opentype');
+            src: url('assets/fonts/Loos-Compressed-Black.woff2') format('woff2'), url('assets/fonts/Loos-Compressed-Black.otf') format('opentype');
             font-style: normal;
             font-weight: 900;
             font-display: swap;
         }
         @font-face {
             font-family: 'Loos Compressed Bold';
-            src: url('assets/fonts/Loos-Compressed-Bold.otf') format('opentype');
+            src: url('assets/fonts/Loos-Compressed-Bold.woff2') format('woff2'), url('assets/fonts/Loos-Compressed-Bold.otf') format('opentype');
             font-style: normal;
             font-weight: 700;
             font-display: swap;
@@ -988,7 +990,7 @@ let currentLeague = null;
 
 // ===== CUSTOM PLAYERS (IndexedDB) =====
 const CUSTOM_DB_NAME = 'basquet_custom_players';
-const CUSTOM_DB_VER = 2;
+const CUSTOM_DB_VER = 3;
 let customDB = null;
 
 function openCustomDB() {
@@ -1002,6 +1004,9 @@ function openCustomDB() {
             }
             if (!db.objectStoreNames.contains('poses')) {
                 db.createObjectStore('poses', { keyPath: 'playerFile' });
+            }
+            if (!db.objectStoreNames.contains('slotImages')) {
+                db.createObjectStore('slotImages', { keyPath: 'key' });
             }
         };
         req.onsuccess = (e) => { customDB = e.target.result; resolve(customDB); };
@@ -1043,6 +1048,50 @@ async function removeCustomPlayer(id) {
         tx.objectStore('players').delete(id);
         tx.oncomplete = resolve;
     });
+}
+
+// ===== SLOT IMAGES (IndexedDB) =====
+// Each canvas slot (player1, team1Logo, bgImage, ...) keeps one downscaled copy
+// here, written once when the image is assigned. Auto-save then only has to
+// serialise inputs to localStorage.
+const SLOT_IMAGE_MAX = 800;
+const _slotImagePersisted = {}; // key -> img currently persisted for that slot
+function slotStoreTx(mode, fn) {
+    return openCustomDB().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction('slotImages', mode);
+        const req = fn(tx.objectStore('slotImages'));
+        tx.oncomplete = () => resolve(req && req.result);
+        tx.onerror = () => reject(tx.error);
+    }));
+}
+function encodeSlotImage(img) {
+    return new Promise((resolve) => {
+        try {
+            let w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+            if (!w || !h) { resolve(null); return; }
+            if (w > SLOT_IMAGE_MAX || h > SLOT_IMAGE_MAX) { const r = Math.min(SLOT_IMAGE_MAX/w, SLOT_IMAGE_MAX/h); w = Math.round(w*r); h = Math.round(h*r); }
+            const c = document.createElement('canvas'); c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            c.toBlob(b => resolve(b), 'image/png');
+        } catch (e) { resolve(null); } // tainted canvas
+    });
+}
+async function persistSlotImage(key, img) {
+    if (!img || _slotImagePersisted[key] === img) return;
+    _slotImagePersisted[key] = img;
+    try {
+        const blob = await encodeSlotImage(img);
+        // The slot may have been cleared or replaced while encoding: do not resurrect it.
+        if (!blob || state.images[key] !== img) return;
+        await slotStoreTx('readwrite', store => store.put({ key, blob, savedAt: Date.now() }));
+    } catch (e) {}
+}
+async function deleteSlotImage(key) {
+    delete _slotImagePersisted[key];
+    try { await slotStoreTx('readwrite', store => store.delete(key)); } catch (e) {}
+}
+async function loadSlotImages() {
+    try { return (await slotStoreTx('readonly', store => store.getAll())) || []; } catch (e) { return []; }
 }
 
 // ===== PLAYER POSE CACHE =====
@@ -1455,25 +1504,15 @@ function showLogoPreview(previewId, logo) {
 }
 
 function lazyLoadThumbs(container) {
-    const THUMB_SIZE = 60;
 
+    // data-src holds the pre-generated thumbnail path (never the full photo).
     function loadThumb(imgEl) {
         const src = imgEl.dataset.src;
-        if (!src) return;
         delete imgEl.dataset.src;
-        const tmp = new Image();
-        tmp.crossOrigin = 'anonymous';
-        tmp.onload = () => {
-            const tc = document.createElement('canvas'), tx = tc.getContext('2d');
-            tc.width = THUMB_SIZE; tc.height = THUMB_SIZE;
-            const scale = Math.max(THUMB_SIZE / tmp.width, THUMB_SIZE / tmp.height);
-            const w = tmp.width * scale, h = tmp.height * scale;
-            tx.drawImage(tmp, (THUMB_SIZE - w) / 2, (THUMB_SIZE - h) / 2, w, h);
-            imgEl.src = tc.toDataURL('image/jpeg', 0.5);
-        };
-        // 404 / tainted: keep placeholder, never re-request the same URL
-        tmp.onerror = () => { imgEl.classList.add('lib-thumb-missing'); };
-        tmp.src = src;
+        if (!src) { imgEl.classList.add('lib-thumb-missing'); return; }
+        // 404: keep placeholder, never re-request the same URL
+        imgEl.onerror = () => { imgEl.onerror = null; imgEl.classList.add('lib-thumb-missing'); };
+        imgEl.src = src;
     }
 
     const imgs = container.querySelectorAll('img[data-src]');
@@ -1512,7 +1551,7 @@ async function onLibTeamSelect(teamNum) {
     }
 
     // ── Liga sin fotos: usar escudo como imagen del jugador ──
-    const isLogoOnly = LOGO_ONLY_LEAGUES.has(leagueKey);
+    const isLogoOnly = LOGO_ONLY_LEAGUES.has(leagueKey) || !(team.players && team.players.length);
     const thumbsDiv = document.getElementById(`libPlayer${teamNum}Thumbs`);
     thumbsDiv.innerHTML = '';
 
@@ -1542,7 +1581,7 @@ async function onLibTeamSelect(teamNum) {
         img.title = p.number ? `#${p.number} ${p.name}` : p.name || p.file.split('/').pop();
         img.loading = 'lazy';
         img.decoding = 'async';
-        img.dataset.src = encodeURI(p.file);
+        if (p.thumb) img.dataset.src = encodeURI(p.thumb); else img.classList.add('lib-thumb-missing');
         img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44"><rect fill="%230a1628" width="44" height="44"/></svg>';
         img.onclick = async () => {
             thumbsDiv.querySelectorAll('.lib-thumb,.lib-thumb-wrap .lib-thumb').forEach(t => t.classList.remove('active'));
@@ -1702,8 +1741,8 @@ function initBgGallery() {
         thumb.style.cssText = 'width:60px;height:40px;object-fit:cover;border-radius:4px';
         thumb.title = `Fondo ${i + 1}`;
         thumb.loading = 'lazy';
-        thumb.src = encodeURI(thumbPath);
         thumb.onerror = () => { thumb.classList.add('lib-thumb-missing'); thumb.onerror = null; };
+        if (thumbPath) thumb.src = encodeURI(thumbPath); else thumb.classList.add('lib-thumb-missing');
         thumb.onclick = () => {
             sel.value = fullPath;
             onBgSelect();
@@ -1720,6 +1759,7 @@ async function onBgSelect() {
     if (val === 'transparent') {
         state.transparent = true;
         state.images.bgImage = null;
+        deleteSlotImage('bgImage');
         const box = document.getElementById('boxBgImage');
         box.classList.remove('has-image');
         const prev = box.querySelector('img');
@@ -1891,11 +1931,11 @@ let canvas, ctx;
 function handleUpload(input, key, boxId) {
     const file = input.files[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = (e) => { const img = new Image(); img.onload = () => { state.images[key] = img; const box = document.getElementById(boxId); box.classList.add('has-image'); const prev = box.querySelector('img'); if (prev) prev.remove(); const p = document.createElement('img'); p.src = e.target.result; box.insertBefore(p, box.firstChild); render(); }; img.src = e.target.result; };
+    reader.onload = (e) => { const img = new Image(); img.onload = () => { state.images[key] = img; persistSlotImage(key, img); const box = document.getElementById(boxId); box.classList.add('has-image'); const prev = box.querySelector('img'); if (prev) prev.remove(); const p = document.createElement('img'); p.src = e.target.result; box.insertBefore(p, box.firstChild); render(); }; img.src = e.target.result; };
     reader.readAsDataURL(file);
 }
 function removeImage(ev, key, boxId) {
-    ev.stopPropagation(); delete state.images[key]; const box = document.getElementById(boxId); box.classList.remove('has-image');
+    ev.stopPropagation(); delete state.images[key]; deleteSlotImage(key); const box = document.getElementById(boxId); box.classList.remove('has-image');
     const img = box.querySelector('img'); if (img) img.remove(); const inp = box.querySelector('input[type="file"]'); if (inp) inp.value = ''; render();
 }
 function loadCustomFont(input) {
@@ -2323,9 +2363,12 @@ function applyPixelEffects(off, fx) {
     oc.putImageData(id, 0, 0);
 }
 
-function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
-    if (!img) return;
-    const fx = _frameFx || getFxState();
+// Builds the processed player layer (effects, feathered edges) and the
+// behind-player layer (glow, shadow, ghost). Pure function of its inputs, so
+// results are cached by getPlayerLayer(). Temporary canvases come from a pool.
+function buildPlayerLayer(img, w, H, scale, fx) {
+    const _tmpCanvases = [];
+    const acquireTmpCanvas = () => { const c = _canvasPool.pop() || document.createElement('canvas'); _tmpCanvases.push(c); return c; };
     const off = document.createElement('canvas'); off.width = Math.ceil(w*1.1); off.height = H;
     const oc = off.getContext('2d');
     const s = Math.max(off.width/img.width, H/img.height)*(scale||1);
@@ -2418,7 +2461,7 @@ function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
 
     // 3. Neon Outline
     if (fx.neonOutline) {
-        const tmp = document.createElement('canvas'); tmp.width = off.width; tmp.height = H;
+        const tmp = acquireTmpCanvas(); tmp.width = off.width; tmp.height = H;
         const tc = tmp.getContext('2d');
         tc.drawImage(off, 0, 0);
         tc.globalCompositeOperation = 'source-in';
@@ -2435,7 +2478,7 @@ function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
         oc.save();
         oc.globalCompositeOperation = 'destination-out';
         oc.filter = `blur(1px)`;
-        const shrink = document.createElement('canvas'); shrink.width=off.width; shrink.height=H;
+        const shrink = acquireTmpCanvas(); shrink.width=off.width; shrink.height=H;
         const sc2 = shrink.getContext('2d');
         sc2.drawImage(off, fx.bw*0.5, fx.bw*0.5, off.width-fx.bw, H-fx.bw);
         // We skip the full erosion - the blur outline is the effect
@@ -2445,7 +2488,7 @@ function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
 
     // 4. Line Outline (solid contour line)
     if (fx.lineOutline) {
-        const tmp = document.createElement('canvas'); tmp.width = off.width; tmp.height = H;
+        const tmp = acquireTmpCanvas(); tmp.width = off.width; tmp.height = H;
         const tc = tmp.getContext('2d');
         const bw = fx.bw;
         // Draw expanded silhouette
@@ -2466,7 +2509,7 @@ function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
 
     // 5. Magazine cutout border (dashed white + offset)
     if (fx.magazine) {
-        const tmp = document.createElement('canvas'); tmp.width = off.width; tmp.height = H;
+        const tmp = acquireTmpCanvas(); tmp.width = off.width; tmp.height = H;
         const tc = tmp.getContext('2d');
         const bw = Math.max(2, fx.bw);
         // Create expanded outline
@@ -2476,7 +2519,7 @@ function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
         }
         tc.globalCompositeOperation = 'source-in';
         // Dashed pattern: alternating white and transparent
-        const pat = document.createElement('canvas'); pat.width = 12; pat.height = 12;
+        const pat = acquireTmpCanvas(); pat.width = 12; pat.height = 12;
         const ptc = pat.getContext('2d');
         ptc.fillStyle = '#fff'; ptc.fillRect(0, 0, 6, 6); ptc.fillRect(6, 6, 6, 6);
         ptc.fillStyle = fx.c1; ptc.fillRect(6, 0, 6, 6); ptc.fillRect(0, 6, 6, 6);
@@ -2517,7 +2560,7 @@ function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
 
     // 10. Grain/Noise
     if (fx.grain) {
-        const grainC = document.createElement('canvas'); grainC.width = off.width; grainC.height = H;
+        const grainC = acquireTmpCanvas(); grainC.width = off.width; grainC.height = H;
         const gc = grainC.getContext('2d');
         const gid = gc.createImageData(off.width, H);
         const gd = gid.data;
@@ -2535,7 +2578,7 @@ function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
 
     // 14. Glitch RGB split
     if (fx.glitch) {
-        const glC = document.createElement('canvas'); glC.width = off.width; glC.height = H;
+        const glC = acquireTmpCanvas(); glC.width = off.width; glC.height = H;
         const glx = glC.getContext('2d');
         glx.drawImage(off, 0, 0);
         const gid = glx.getImageData(0, 0, glC.width, H);
@@ -2585,7 +2628,7 @@ function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
         const size = Math.max(2, Math.round(3 + fx.int * 22));
         const sw = Math.max(1, Math.floor(off.width / size));
         const sh = Math.max(1, Math.floor(H / size));
-        const tmp = document.createElement('canvas');
+        const tmp = acquireTmpCanvas();
         tmp.width = off.width; tmp.height = H;
         const tc = tmp.getContext('2d');
         tc.imageSmoothingEnabled = false;
@@ -2596,6 +2639,47 @@ function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
         oc.imageSmoothingEnabled = true;
     }
 
+    _releaseCanvases(_tmpCanvases);
+    return { off, preFx };
+}
+
+const _canvasPool = [];
+const CANVAS_POOL_MAX = 12;
+function _releaseCanvases(list) {
+    for (const c of list) {
+        if (_canvasPool.length >= CANVAS_POOL_MAX) break;
+        c.width = 1; c.height = 1; // drop the backing store, keep the element
+        _canvasPool.push(c);
+    }
+}
+
+// Per-image LRU of processed layers. Key covers everything the layer depends on,
+// so a pure horizontal move is a cache hit while scale/effect changes rebuild.
+const _playerLayerCache = new WeakMap();
+const PLAYER_LAYER_LRU = 6;
+const playerLayerStats = { hits: 0, misses: 0 };
+function _fxKey(fx) {
+    let k = '';
+    for (const name in fx) if (name !== 'anyActive' && name !== 'rgb1' && name !== 'rgb2') k += fx[name] + ',';
+    return k;
+}
+function getPlayerLayer(img, w, H, scale, fx) {
+    const key = Math.ceil(w*1.1) + '|' + H + '|' + (scale || 1) + '|' + _fxKey(fx);
+    let perImg = _playerLayerCache.get(img);
+    if (!perImg) { perImg = new Map(); _playerLayerCache.set(img, perImg); }
+    let layer = perImg.get(key);
+    if (layer) { perImg.delete(key); perImg.set(key, layer); playerLayerStats.hits++; return layer; }
+    playerLayerStats.misses++;
+    layer = buildPlayerLayer(img, w, H, scale, fx);
+    perImg.set(key, layer);
+    if (perImg.size > PLAYER_LAYER_LRU) perImg.delete(perImg.keys().next().value);
+    return layer;
+}
+
+function drawPlayer(ctx, img, x, w, H, bgDark, fadeL, fadeR, scale) {
+    if (!img) return;
+    const fx = _frameFx || getFxState();
+    const { off, preFx } = getPlayerLayer(img, w, H, scale, fx);
     // 12. Mirror/Reflection (draw below)
     // Draw pre-fx (glow, shadow, ghost) behind
     ctx.drawImage(preFx, x, 0);
@@ -3763,7 +3847,7 @@ function resetCanvasContent() {
     state.bgImagePath = '';
 
     ['bgImage','player1','player2','player3','player4','leagueLogo','team1Logo','team2Logo','sec1LogoA','sec1LogoB','sec2LogoA','sec2LogoB']
-        .forEach(key => delete state.images[key]);
+        .forEach(key => { delete state.images[key]; deleteSlotImage(key); });
     ['boxBgImage','boxPlayer1','boxPlayer2','boxPlayer3','boxPlayer4','boxLeagueLogo','boxTeam1Logo','boxTeam2Logo','boxSec1LogoA','boxSec1LogoB','boxSec2LogoA','boxSec2LogoB']
         .forEach(clearUploadBox);
 
@@ -3824,37 +3908,19 @@ function resetCanvasContent() {
 let _saveTimer = null;
 function scheduleSave() {
     if (_saveTimer) clearTimeout(_saveTimer);
-    _saveTimer = setTimeout(doSave, 400);
+    _saveTimer = setTimeout(doSave, SAVE_DEBOUNCE_MS);
 }
-const _saveImageCache = {}; // key -> { img, dataURL } — ponytail: avoids re-encoding unchanged images every 400ms
+const SAVE_DEBOUNCE_MS = 1000;
+// Images live in IndexedDB (see persistSlotImage); this only writes inputs.
 function doSave() {
     try {
-        const data = { template: state.template, inputs: {}, images: {}, checks: {} };
+        const data = { template: state.template, inputs: {}, checks: {} };
         SAVE_INPUTS.forEach(id => { const el = document.getElementById(id); if (el) data.inputs[id] = el.value; });
         SAVE_CHECKBOXES.forEach(id => { const el = document.getElementById(id); if (el) data.checks[id] = el.checked; });
         // Save league/team selects
         ['mainLeagueSelect','libTeam1Select','libTeam2Select',
          'sec1League','sec2League','libSec1ASelect','libSec1BSelect','libSec2ASelect','libSec2BSelect'
         ].forEach(id => { const el = document.getElementById(id); if (el) data.inputs[id] = el.value; });
-        // Save images as dataURL via tiny canvas (max 800px to keep localStorage small)
-        const mc = document.createElement('canvas'), mx = mc.getContext('2d');
-        SAVE_IMAGES.forEach(key => {
-            const img = state.images[key];
-            if (!img) return;
-            const cached = _saveImageCache[key];
-            if (cached && cached.img === img) { data.images[key] = cached.dataURL; return; }
-            const MAX = 800;
-            let w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
-            if (w > MAX || h > MAX) { const r = Math.min(MAX/w, MAX/h); w = Math.round(w*r); h = Math.round(h*r); }
-            mc.width = w; mc.height = h;
-            mx.clearRect(0,0,w,h);
-            mx.drawImage(img, 0, 0, w, h);
-            try {
-                const dataURL = mc.toDataURL('image/jpeg', 0.7);
-                data.images[key] = dataURL;
-                _saveImageCache[key] = { img, dataURL };
-            } catch(e) {}
-        });
         // Save which player file is in each slot so poses can be restored
         data.playerFiles = { ...state.playerFiles };
         localStorage.setItem(SAVE_KEY, JSON.stringify(data));
@@ -3950,12 +4016,24 @@ async function restoreSaved() {
         sec1LogoA:'boxSec1LogoA', sec1LogoB:'boxSec1LogoB',
         sec2LogoA:'boxSec2LogoA', sec2LogoB:'boxSec2LogoB'
     };
+    // Legacy saves embedded images in localStorage; move them to IndexedDB once.
     if (data.images) {
-        const imgKeys = Object.keys(data.images);
-        await Promise.all(imgKeys.map(key => new Promise(resolve => {
+        for (const key of Object.keys(data.images)) {
+            try { await slotStoreTx('readwrite', store => store.put({ key, dataURL: data.images[key], savedAt: Date.now() })); } catch (e) {}
+        }
+        delete data.images;
+        try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch (e) {}
+    }
+    const slotRows = (await loadSlotImages()).filter(r => SAVE_IMAGES.includes(r.key));
+    if (slotRows.length) {
+        await Promise.all(slotRows.map(row => new Promise(resolve => {
+            const key = row.key;
             const img = new Image();
+            const objectURL = row.blob ? URL.createObjectURL(row.blob) : null;
             img.onload = () => {
                 state.images[key] = img;
+                if (row.blob) _slotImagePersisted[key] = img; // already stored as a blob
+                else persistSlotImage(key, img);             // legacy dataURL row: re-encode once
                 const boxId = boxMap[key];
                 if (boxId) {
                     const box = document.getElementById(boxId);
@@ -3964,7 +4042,7 @@ async function restoreSaved() {
                 resolve();
             };
             img.onerror = resolve;
-            img.src = data.images[key];
+            img.src = objectURL || row.dataURL;
         })));
     }
 
@@ -4017,9 +4095,9 @@ async function restoreSaved() {
 
 // Hook auto-save into render and image changes
 const _origRender = render;
-render = function() { _origRender(); scheduleSave(); schedulePoseSave(); };
+render = function(mode) { _origRender(mode); scheduleSave(); schedulePoseSave(); };
 const _origSetImage = setImageToBox;
-setImageToBox = function(key, boxId, img) { _origSetImage(key, boxId, img); scheduleSave(); };
+setImageToBox = function(key, boxId, img) { _origSetImage(key, boxId, img); persistSlotImage(key, img); scheduleSave(); };
 
 // ===== EXPORTAR / IMPORTAR JUGADORES CUSTOM =====
 async function exportCustomPlayers() {
